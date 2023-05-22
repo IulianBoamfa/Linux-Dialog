@@ -1,0 +1,144 @@
+#!/bin/bash	
+
+f_Date_Time()	#Function for Date and time
+{
+  dialog --title "Now..." --backtitle "1.Date/Time" --msgbox "$(date)" 15 50	#Builds a message box to display the current time and date
+}
+
+f_Calendar()	#Function to build calendar
+{
+while true;	
+do
+
+  event_d=$(dialog \
+  --backtitle "2.Calendar" \
+  --calendar "Calendar\nSelect a date:" 3 40 $(now) 3>&1 1>&2 2>&3 3>&-) 	#Command to build a calendar box which will return the date to be stored in our variable
+  exit_s=$?	#Saves the exit status
+   	
+   case $exit_s in	
+   	1)	#Statement to verify the exit status 
+    break	#Close the current window if Cancel has been pressed
+    ;;
+    esac	#Close the case statement
+    
+  event_inf=$(dialog \
+  --backtitle "2.Calendar" \
+  --inputbox "Event info: " 15 40 3>&1 1>&2 2>&3 3>&-)	#Input box to store the user`s input into our variable
+  exit_s2=$?	#Saves exit status
+   	
+   case $exit_s2 in	
+   	1)	#Statement to verify the exit status
+    break	
+    ;;
+    esac	#Close the case statement
+       
+  event="$event_d $event_inf"	#Saves the event info into our variable
+  echo $event >> calendar.txt	#Writes the variable content into calendar.txt
+  dialog --msgbox "$event_d\n$event_inf\nYour event has been saved in your calendar.txt document." 30 50	#Display a message for the user regarding the saving status of his event
+  break 	#Closing the while loop
+  
+done	#While loop syntax
+}
+
+
+f_Delete()	#Funtion to select the file to be deleted
+{
+ 
+ file_deletion()	#Function to delete the file
+ {
+  if [ -f $file ] 	#Checks if the selection is a file
+  then
+   	/bin/rm $file	#Delete the file
+   	status="Process status - Success"	#Updates the status of the process
+  else
+   	status="Your selection is not a file."	#Updates the status of the file
+  fi	#Close the if statement
+ }
+
+while true;	
+do	
+   input=$(dialog --backtitle "3.Delete" --inputbox "Please insert the name of the directory:" 15 30  3>&1 1>&2 2>&3 3>&-) 	#Saves the name of the directory inputed by the user into our variable	
+   exit_stat=$?		#Saves the exit status
+   
+   case $exit_stat in 
+   	1)	#Checks the exit status
+   break	#Closing the current window if Cancel has been pressed
+   ;;
+   esac	#End of case statement
+   
+   file=$(dialog --title "List of files" --fselect /"$input"/ 100 100 3>&1 1>&2 2>&3 3>&-) 	#Saves the name of the file into our variable
+   exit_stat=$?	#Exit status
+   status="Process status - Failed"	#Sets the initial status to failed. If process succeeds the status will be modified
+   dialog --backtitle "3.Delete" --title "Confirmation required!" --yesno "Do you really want to delete thias file?" 15 30 	#Asks user for confirmation
+   resp=$?	#Saves the answer
+   
+   case $exit_stat in 
+   	1)		#Checks the exit status
+   break		#Closing the current window
+   ;;
+   esac		#End of case statement
+   
+  case $resp in 
+  	0)		#Checks the confirmation from the user before proceeding to the deletion
+    file_deletion	#Calls the function to delete the file
+    ;;
+    	1)
+    	break		#If confirmation is not given, process will end
+    	;;
+   esac			#End of case file
+   
+   dialog --backtitle "3.Delete" --title "Progress..." --msgbox "$status" 10 30		#Prompts a message for the user regarding the deletion process
+   break		#Closing the current file, back to the main menu
+   
+done		#End of the while loop
+}
+
+
+f_System_Info()		#Function to display system infos
+{
+	source ./System_Info_com	#Import the System_Info script to be executed in this file
+}
+
+while true;
+do
+   	
+  result=$(dialog \
+	   --backtitle "Coursework 2" \
+	   --title "MAIN MENU" \
+	   --menu "Select one of the options:" 15 60 5 1 Date/Time 2 Calendar 3 Delete 4 System_Info 5 Exit 3>&1 1>&2 2>&3 3>&-)	#Builds the main menu and saves the output into our variable
+   exit_st=$?	#Saves the exit state
+   
+   
+   case $exit_st in 
+   	1)	#Checks the exit status 
+     clear	#Clears the terminal
+     echo "Program canceled."	#Prints the message in terminal
+     exit	#Exit the program
+     ;;
+   esac
+     
+    case $result in 
+    	1)		#Depending on the choice of the user, the proper function will be called.
+    f_Date_Time
+    ;;
+    	2)
+    f_Calendar
+    ;;
+    	3)
+    f_Delete
+    ;;
+    	4)
+    f_System_Info
+    ;;
+    	5)
+    clear
+    echo "Program closed."		#If the exit is selected, the message will be printed, terminal will be cleared and program will be closed
+    exit
+    ;;
+     
+    esac
+		
+
+done
+
+

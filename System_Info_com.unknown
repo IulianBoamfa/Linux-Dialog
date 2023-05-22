@@ -1,0 +1,90 @@
+#!/bin/bash
+
+f_Your_operating_system_type() 	#Function to display operating system info
+{
+	dialog \
+	--backtitle "1.Your_operating_system_type" \
+	--title "Operating System Information" \
+	--msgbox ">>>System name:$(uname)\n>>>Network hostname:$(uname -n)\n>>>Kernel-version:$(uname -v)\n>>>Kernel release:$(uname -r)" 15 60		#Display a message box containing the info
+}
+
+f_Computer_CPU_Information()		#Function to display info abou the CPU
+{
+	dialog \
+	--backtitle "2.Computer_CPU_Information" \
+	--title "CPU Details" \
+	--msgbox "$(lscpu)" 45 100		#Builds a message box containing the info about CPU
+}
+
+f_Memory_information()		#Function to display info about memory
+{
+	dialog \
+	--backtitle "3.Memory_information" \
+	--title "Memory Info" \
+	--msgbox "$(cat /proc/meminfo)" 45 100		#Builds a message box containing info about the memory
+}
+
+f_Hard_disk_information()		#Function to display info about hard disk
+{
+	dialog \
+	--backtitle "4.Hard_disk_information" \
+	--title "Hrad disk info" \
+	--msgbox "$(sudo lshw -class disk)" 45 100		#Builds a message box containing info about hard disk
+}
+
+f_File_system()		#Function to display info about file system
+{
+	dialog \
+	--backtitle "5.File_System" \
+	--title "File System info" \
+	--msgbox "$(findmnt)" 45 100		#Builds a message box containing info about file system
+}
+ 
+while true;
+do	
+ 	select=$(dialog \
+	   --backtitle "4.System Information" \
+	   --title "System Information" \
+	   --menu "Select one of the options:" 15 60 5 1 Your_operating_system_type 2 Computer_CPU_Information 3 Memory_information 4 Hard_disk_information 5 File_system 3>&1 1>&2 2>&3 3>&-)	#Builds a menu containing the options for user to choose
+   exit_state=$?	#Saves the exit state
+   	
+    
+     
+    case $exit_state in 
+    	1)		#Checks the exit state
+    	break
+    	;;
+    esac   	#End of case statement
+    
+     
+    case $select in 
+    	1)  		#Depending on the user selection, the properfunction will be called to display the right output
+    f_Your_operating_system_type
+    ;;
+    	2)
+    f_Computer_CPU_Information
+    ;;
+    	3)
+    f_Memory_information
+    ;;
+    	4)
+    f_Hard_disk_information
+    ;;
+    	5)
+    f_File_system
+    ;;
+    
+    esac
+ 
+ done
+
+
+
+
+  
+
+
+
+
+
+
